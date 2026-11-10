@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Gestión Porcina</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f6f9; 
+            margin: 0; 
+            padding: 40px 20px; 
+            color: #333; 
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+        }
+        h1, h2 { color: #2c3e50; }
+        h1 { border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0; }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        label { font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; color: #555; }
+        input { 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            font-size: 1rem; 
+        }
+        input:focus { outline: none; border-color: #3498db; }
+        
+        button { 
+            background: #27ae60; 
+            color: white; 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            height: 42px;
+        }
+        button:hover { background: #2ecc71; }
+
+        .grid { 
+            display: flex; 
+            gap: 15px; 
+            flex-wrap: wrap; 
+        }
+        
+        /* Estilos actualizados para la tarjeta */
+        .card { 
+            background: #fdfefe; 
+            border: 1px solid #bdc3c7; 
+            padding: 15px; 
+            border-radius: 8px; 
+            width: calc(33.333% - 10px); 
+            box-sizing: border-box; 
+            text-align: center; 
+            cursor: pointer; /* Cursor de manito */
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; /* Animación suave */
+            user-select: none; /* Evita que el texto se sombree al hacer doble clic */
+        }
+        .card:hover {
+            transform: translateY(-5px); /* Se levanta un poco */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1); /* Sombra más grande */
+            border-color: #3498db; /* Borde azul */
+        }
+        .card h3 { margin: 0 0 10px 0; font-size: 1.2rem; }
+        .card p { margin: 0; color: #7f8c8d; }
+        .hint { font-size: 0.75rem; color: #aaa; margin-top: 10px !important; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Inventario de Cerdos</h1>
+        
+        <!-- Formulario -->
+        <form id="formCerdo" class="form-row">
+            <div class="input-group">
+                <label for="nombre">Nombre o Alias</label>
+                <input type="text" id="nombre" placeholder="Ej: Marcela" required>
+            </div>
+            <div class="input-group">
+                <label for="idOficial">ID Oficial / Arete</label>
+                <input type="text" id="idOficial" placeholder="Ej: C-104" required>
+            </div>
+            <button type="submit">Registrar</button>
+        </form>
+
+        <!-- Lista de Cerdos -->
+        <h2>Cerdos Registrados</h2>
+        <div id="listaCerdos" class="grid">
+            <!-- Las tarjetas se generan aquí -->
+        </div>
+    </div>
+
+    <script>
+        let cerdos = JSON.parse(localStorage.getItem('cerdosDB')) || [];
+
+        function renderizarCerdos() {
+            const contenedor = document.getElementById('listaCerdos');
+            contenedor.innerHTML = ''; 
+
+            if (cerdos.length === 0) {
+                contenedor.innerHTML = '<p style="color: #7f8c8d;">No hay cerdos registrados aún.</p>';
+                return;
+            }
+
+            cerdos.forEach(cerdo => {
+                // Se agregó ondblclick apuntando a la nueva función abrirDatos()
+                contenedor.innerHTML += `
+                    <div class="card" ondblclick="abrirDatos('${cerdo.idOficial}')" title="Doble clic para ver detalles">
+                        <h3>🐷 ${cerdo.nombre}</h3>
+                        <p>ID: ${cerdo.idOficial}</p>
+                        <p class="hint">(Doble clic para abrir)</p>
+                    </div>
+                `;
+            });
+        }
+
+        // NUEVA FUNCIÓN: Redirige a datos.html
+        function abrirDatos(id) {
+            window.location.href = `datos.html?id=${id}`;
+        }
+
+        document.getElementById('formCerdo').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+
+            const nombre = document.getElementById('nombre').value;
+            const idOficial = document.getElementById('idOficial').value;
+
+            cerdos.push({ nombre: nombre, idOficial: idOficial });
+            localStorage.setItem('cerdosDB', JSON.stringify(cerdos));
+
+            this.reset();
+            renderizarCerdos();
+        });
+
+        renderizarCerdos();
+    </script>
+</body>
+</html>
